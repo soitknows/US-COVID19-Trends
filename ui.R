@@ -17,7 +17,7 @@ ui <- fluidPage(
                     label = "Mode",
                     choices = c("Single County", "County Comparison")),          
         radioButtons(inputId = "output",
-                    label = "output",
+                    label = "Output",
                     choices = c("Cases", "Cases / Population")),
         selectInput(inputId = "state1",
                     label = "State",
