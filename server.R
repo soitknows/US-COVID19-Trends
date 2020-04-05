@@ -33,16 +33,21 @@ function (input, output, session) {
   })
 
   output$stats<- renderPlotly({
-    if (input$output == "Cases"){
+    if (input$output == "Cases" & input$mode == "Single County"){
+      plot_ly(df(), x= ~x, y = ~y1, type='scatter', mode = 'lines', name = input$county1) %>%
+        layout(xaxis = list(title="DATE"), yaxis = list(title="CASES"))
+    } else if (input$output == "Cases" & input$mode == "County Comparison"){
+      plot_ly(df(), x= ~x, y = ~y1, type='scatter', mode = 'lines', name = input$county1) %>%
+        add_trace(y = ~y2, name = input$county2) %>% 
+        layout(xaxis = list(title="DATE"), yaxis = list(title="CASES / POPULATION"))
+    } else if (input$output == "Cases / Population" & input$mode == "Single County") {
+      plot_ly(df(), x= ~x, y = ~a1, type='scatter', mode = 'lines', name = input$county1) %>%
+        layout(xaxis = list(title="DATE"), yaxis = list(title="CASES"))
+    } else {
       plot_ly(df(), x= ~x, y = ~y1, type='scatter', mode = 'lines', name = input$county1) %>%
         add_trace(y = ~y2, name = input$county2) %>% 
         layout(xaxis = list(title="DATE"), yaxis = list(title="CASES"))
-    } else {
-      plot_ly(df(), x= ~x, y = ~a1, type='scatter', mode = 'lines', name = input$county1) %>%
-        add_trace(y = ~a2, name = input$county2) %>% 
-        layout(xaxis = list(title="DATE"), yaxis = list(title="CASES / POPULATION"))
     }
-    
   })
   
   observe({
