@@ -2,20 +2,6 @@
 
 R Shiny app to plot COVID-19 confirmed cases over time for United States counties. 
 
-
-**Parameters:**
-
-* Mode
-	* `Single County` - single line plot output
-	* `County Comparison` - two line plot output
-* Output
-	* `Cases` - confirmed case count
-	* `Cases / Population` - confirmed case count divided by the county's estimated 2019 population.
-* State
-	* State Name
-* County
-	* County Name (choices dependent upong State parameter)
-
 **Data Sources:**
 
 * [Johns Hopkins CSSE COVID-19 Data Repository](https://github.com/CSSEGISandData/COVID-19)
