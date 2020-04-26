@@ -1,0 +1,19 @@
+/* County 1 */
+th:nth-child(n+2):nth-child(-n+5){
+  background-color: #79c7fc;
+}
+
+tr td:nth-child(n+2):nth-child(-n+5){
+  background-color: #bfe5ff;
+}
+
+
+/* County 2*/
+th:nth-child(n+6) {
+  background-color: #ffd089;
+}
+tr td:nth-child(n+6) {
+  background-color: #ffe6bf;
+}
+
+

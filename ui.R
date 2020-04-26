@@ -9,48 +9,50 @@ tags <- tagList("DATA SOURCE:  ", source)
 
 ui <- fluidPage(
   
+    theme= "bootstrap.css",
+  
     titlePanel("U.S. COVID-19 Trends"),
-    helpText("Single County"),
-    sidebarLayout(
-      sidebarPanel(width = 3,
-        selectInput(inputId = "state1",
-                    label = "State",
-                    choices = states[states$Country_Region == "US" & states$Admin2 != "",]$Province_State,
-                    selected = states[states$Country_Region == "US" & states$Admin2 != "",]$Province_State[1]),
-        selectInput(inputId = "county1",
-                    label = "County",
-                    choices = NULL)
-      ),
-      mainPanel(width = 9,
-        plotlyOutput(outputId = "single_plot")
-      )
-    ),
     
-    helpText("County Comparison"),
+    
     sidebarLayout(
-      sidebarPanel(width = 3,
-        radioButtons(inputId = "output",
+      sidebarPanel(width = 4,
+                   
+        radioButtons(inputId = "outputCompare",
                      label = "Output",
-                     choices = c("Cases", "Cases / Population")),
-        selectInput(inputId = "state2",
-                    label = "State",
+                     choices = c("Cases", "Cases per 100k people")),
+        
+        hr(),
+        
+        selectInput(inputId = "state1Compare",
+                    label = "State 1",
                     choices = states[states$Country_Region == "US" & states$Admin2 != "",]$Province_State,
                     selected = states[states$Country_Region == "US" & states$Admin2 != "",]$Province_State[1]),
-        selectInput(inputId = "county2",
-                    label = "County",
-                    choices = NULL),
-        selectInput(inputId = "state3",
-                    label = "State",
+        selectInput(inputId = "county1Compare",
+                    label = "County 1",
+                    choices = c()),
+        
+        hr(),
+        
+        selectInput(inputId = "state2Compare",
+                    label = "State 2",
                     choices = states[states$Country_Region == "US" & states$Admin2 != "",]$Province_State,
                     selected = states[states$Country_Region == "US" & states$Admin2 != "",]$Province_State[1]),
-        selectInput(inputId = "county3",
-                    label = "County",
-                    choices = NULL)
+        selectInput(inputId = "county2Compare",
+                    label = "County 2",
+                    choices = c())
+        
       ),
-      mainPanel(width = 9,
-                plotlyOutput(outputId = "compare_plot")
+      
+      
+      mainPanel(width = 8,
+                plotlyOutput(outputId = "plotCompare"),
+                hr(),
+                tableOutput("dataCompare1")
       )
     ),
     
+    
+    hr(),
     helpText(tags)
+    
 )

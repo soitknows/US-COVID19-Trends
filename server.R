@@ -1,6 +1,7 @@
 library(shiny)
 library(plotly)
 
+
 case_url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv"
 csv <- read.csv(case_url)
 beg <- as.Date(colnames(csv)[13], format = "X%m.%d.%y")
@@ -13,60 +14,51 @@ colnames(pop) <- c("ST", "CTY", "POP")
 
 
 getData <- function (state1, county1, state2, county2, mode) {
-  if (mode == "single"){
-    x <- seq(beg, end, by="days")
-    y1 <- as.numeric(unname(csv[( csv$Admin2 ==  county1 & csv$Province_State == state1), ][,13:ncol(csv)]))
-    p1 <- ifelse(is.na(y1[1]),y1,pop[pop$ST == state1 & pop$CTY == county1,]$POP)
-    a1 <- y1 / p1 * 100
-    df <- data.frame(x,y1,p1,a1)
-    df
-  } else {
-    x <- seq(beg, end, by="days")
-    y1 <- as.numeric(unname(csv[( csv$Admin2 ==  county1 & csv$Province_State == state1), ][,13:ncol(csv)]))
-    y2 <- as.numeric(unname(csv[( csv$Admin2 ==  county2 & csv$Province_State == state2), ][,13:ncol(csv)]))
-    p1 <- ifelse(is.na(y1[1]),y1,pop[pop$ST == state1 & pop$CTY == county1,]$POP)
-    p2 <- ifelse(is.na(y2[1]),y2,pop[pop$ST == state2 & pop$CTY == county2,]$POP)
-    a1 <- y1 / p1 * 100
-    a2 <- y2 / p2 * 100
-    df <- data.frame(x,y1,p1,a1,y2,p2,a2)
-    df
-  }
+  date <- seq(beg, end, by="days")
+  cases1 <- as.numeric(unname(csv[( csv$Admin2 ==  county1 & csv$Province_State == state1), ][,13:ncol(csv)]))
+  cases2 <- as.numeric(unname(csv[( csv$Admin2 ==  county2 & csv$Province_State == state2), ][,13:ncol(csv)]))
+  population1 <- ifelse(is.na(cases1[1]),cases1,pop[pop$ST == state1 & pop$CTY == county1,]$POP)
+  population2 <- ifelse(is.na(cases2[1]),cases2,pop[pop$ST == state2 & pop$CTY == county2,]$POP)
+  avg1 <- cases1 / (population1 / 100000)
+  avg2 <- cases2 / (population2 / 100000)
+  df <- data.frame(date, cases1, population1, avg1, county1, cases2, population2, avg2, county2)
+  df <- df[df$date >= '2020-03-01',]
+  colnames(df) <- c("Date", "Cases1", "Population1", "Per100K1", "County1", "Cases2", "Population2", "Per100K2", "County2")
+  df
 }
 
 
 function (input, output, session) {
 
-  single <- reactive({
-    data <- getData(input$state1, input$county1, mode = "single")
-  })
-  
   compare <- reactive({
-    data <- getData(input$state2, input$county2, input$state3, input$county3, mode = "compare")
+    data <- getData(input$state1Compare, input$county1Compare, input$state2Compare, input$county2Compare, mode = "compare")
   })
 
-  output$single_plot<- renderPlotly({
-      plot_ly(single(), x= ~x, y = ~y1, type='scatter', mode = 'lines', name = input$county1) %>%
-        layout(title = "Single County Cases", xaxis = list(title="DATE"), yaxis = list(title="CASES"))
-  })
   
-  output$compare_plot<- renderPlotly({
-    if (input$output == "Cases") {
-      plot_ly(compare(), x= ~x, y = ~y1, type='scatter', mode = 'lines', name = input$county2) %>%
-        add_trace(y = ~y2, name = input$county3) %>% 
-        layout(title = "Case Comparison", xaxis = list(title="DATE"), yaxis = list(title="CASES"))
+  output$plotCompare<- renderPlotly({
+    if (input$outputCompare == "Cases") {
+      plot_ly(compare(), x= ~as.Date(Date), y = ~Cases1, type='scatter', mode = 'lines', name = input$county1Compare, line = list(color = '#3db1ff', width = 4)) %>%
+        add_trace(y = ~Cases2, name = input$county2Compare, line = list(color = '#ffb649', width = 4)) %>% 
+        layout(title = "", xaxis = list(title="DATE"), yaxis = list(title="CASES"))
     } else {
-      plot_ly(compare(), x= ~x, y = ~a1, type='scatter', mode = 'lines', name = input$county2) %>%
-        add_trace(y = ~a2, name = input$county3) %>% 
-        layout(title = "Case / Population Comparison", xaxis = list(title="DATE"), yaxis = list(title="CASES / POPULATION"))
+      plot_ly(compare(), x= ~as.Date(Date), y = ~Per100K1, type='scatter', mode = 'lines', name = input$county1Compare, line = list(color = '#3db1ff', width = 4)) %>%
+        add_trace(y = ~Per100K2, name = input$county2Compare, line = list(color = '#ffb649', width = 4)) %>% 
+        layout(title = "", xaxis = list(title="DATE"), yaxis = list(title="CASES / POPULATION"))
     }
   })
   
+  fluidRow(
+    column(4,output$dataCompare1 <- renderTable(tail(compare(), n = 7)))
+  )
+  
+  
   observe({
-    counties1 <- csv[(csv$Country_Region == "US" & csv$Province_State == input$state1),]$Admin2
-    counties2 <- csv[(csv$Country_Region == "US" & csv$Province_State == input$state2),]$Admin2
-    counties3 <- csv[(csv$Country_Region == "US" & csv$Province_State == input$state3),]$Admin2
-    updateSelectInput(session, "county1", choices = counties1)
-    updateSelectInput(session, "county2", choices = counties2)
-    updateSelectInput(session, "county3", choices = counties3)
+    counties2 <- csv[(csv$Country_Region == "US" & csv$Province_State == input$state1Compare),]$Admin2
+    updateSelectInput(session, "county1Compare", choices = counties2)
+  })
+  
+  observe({
+    counties3 <- csv[(csv$Country_Region == "US" & csv$Province_State == input$state2Compare),]$Admin2
+    updateSelectInput(session, "county2Compare", choices = counties3)
   })
 }
