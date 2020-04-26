@@ -23,6 +23,7 @@ getData <- function (state1, county1, state2, county2, mode) {
   avg2 <- cases2 / (population2 / 100000)
   df <- data.frame(date, cases1, population1, avg1, county1, cases2, population2, avg2, county2)
   df <- df[df$date >= '2020-03-01',]
+  df$date <- as.character((df$date))
   colnames(df) <- c("Date", "Cases1", "Population1", "Per100K1", "County1", "Cases2", "Population2", "Per100K2", "County2")
   df
 }
