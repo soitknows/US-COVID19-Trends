@@ -46,6 +46,7 @@ ui <- fluidPage(
       
       mainPanel(width = 8,
                 plotlyOutput(outputId = "plotCompare"),
+                plotlyOutput(outputId = "plotNewCases"),
                 hr(),
                 tableOutput("dataCompare1")
       )

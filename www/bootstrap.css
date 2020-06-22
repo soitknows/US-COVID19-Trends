@@ -1,19 +1,27 @@
-/* County 1 */
-th:nth-child(n+2):nth-child(-n+5){
-  background-color: #79c7fc;
+/* Date*/
+th:nth-child(n){
+  background-color: #ccc9c9;
+}
+tr td:nth-child(n){
+  background-color: #f5f5f5;
 }
 
-tr td:nth-child(n+2):nth-child(-n+5){
-  background-color: #bfe5ff;
+
+/* County 1 */
+th:nth-child(n+2):nth-child(-n+9){
+  background-color: #79c7fc;
+}
+tr td:nth-child(n+2):nth-child(-n+9){
+  background-color: #f5f5f5;
 }
 
 
 /* County 2*/
-th:nth-child(n+6) {
+th:nth-child(n+10) {
   background-color: #ffd089;
 }
-tr td:nth-child(n+6) {
-  background-color: #ffe6bf;
+tr td:nth-child(n+10) {
+  background-color: #f5f5f5;
 }
 
 
